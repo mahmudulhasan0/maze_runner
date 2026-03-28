@@ -50,8 +50,8 @@ class LevelManager:
                 ],
             },
             {
-                "time_limit": 45,
-                "enemy_speed": 4,
+                "time_limit": 60,
+                "enemy_speed": 3,
                 "enemy_bounds": (407, 687),
                 "layout": [
                     "####################",
