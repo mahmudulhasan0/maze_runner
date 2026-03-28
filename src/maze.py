@@ -1,6 +1,6 @@
 import pygame
 
-from src.settings import TILE_SIZE, WALL_COLOR, PATH_COLOR
+from src.settings import TILE_SIZE, WALL_COLOR, PATH_COLOR, ITEM_SIZE
 
 
 class Maze:
@@ -10,11 +10,15 @@ class Maze:
         self.layout = layout
         self.walls = []
         self.player_start = (0, 0)
+        self.key_position = (0, 0)
+        self.door_position = (0, 0)
         self._build_maze()
 
     def _build_maze(self):
-        """Create wall rectangles and find the player start position."""
+        """Create wall rectangles and find important object positions."""
         self.walls.clear()
+
+        offset = (TILE_SIZE - ITEM_SIZE) // 2
 
         for row_index, row in enumerate(self.layout):
             for col_index, cell in enumerate(row):
@@ -27,6 +31,12 @@ class Maze:
 
                 elif cell == "P":
                     self.player_start = (x + 5, y + 5)
+
+                elif cell == "K":
+                    self.key_position = (x + offset, y + offset)
+
+                elif cell == "D":
+                    self.door_position = (x + offset, y + offset)
 
     def is_wall(self, rect):
         """Return True if the given rectangle touches any wall."""
