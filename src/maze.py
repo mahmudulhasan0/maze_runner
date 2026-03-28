@@ -12,21 +12,16 @@ class Maze:
         self.player_start = (0, 0)
         self.key_position = (0, 0)
         self.door_position = (0, 0)
-
-       
         self.enemy_position = (0, 0)
         self.trap_positions = []
-      
-
+        self.bonus_positions = []
         self._build_maze()
 
     def _build_maze(self):
         """Create wall rectangles and find important object positions."""
         self.walls.clear()
-
-      
         self.trap_positions.clear()
-
+        self.bonus_positions.clear()
 
         offset = (TILE_SIZE - ITEM_SIZE) // 2
 
@@ -53,6 +48,9 @@ class Maze:
 
                 elif cell == "T":
                     self.trap_positions.append((x + offset, y + offset))
+
+                elif cell == "B":
+                    self.bonus_positions.append((x + offset, y + offset))
 
     def is_wall(self, rect):
         """Return True if the given rectangle touches any wall."""
