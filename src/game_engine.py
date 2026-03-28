@@ -6,14 +6,13 @@ from src.settings import (
     FPS,
     TITLE,
     BACKGROUND_COLOR,
-    GRID_COLOR,
     TEXT_COLOR,
     PLAYER_COLOR,
-    TILE_SIZE,
-    PLAYER_START_X,
-    PLAYER_START_Y,
     PLAYER_SIZE,
+    PLAYER_SPEED,
 )
+from src.player import Player
+from src.maze import Maze
 
 
 class GameEngine:
@@ -27,18 +26,40 @@ class GameEngine:
         self.clock = pygame.time.Clock()
         self.running = True
 
-        self.title_font = pygame.font.Font(None, 64)
-        self.info_font = pygame.font.Font(None, 30)
+        self.title_font = pygame.font.Font(None, 60)
+        self.info_font = pygame.font.Font(None, 28)
 
-        self.player_rect = pygame.Rect(
-            PLAYER_START_X,
-            PLAYER_START_Y,
+        self.layout = [
+            "####################",
+            "#P.....#...........#",
+            "#.###..#..#####.##.#",
+            "#...#.....#...#....#",
+            "#.#.#####.#.#.####.#",
+            "#.#.....#.#.#......#",
+            "#.#####.#.#.######.#",
+            "#.....#...#........#",
+            "###.#.#####.######.#",
+            "#...#.....#......#.#",
+            "#.#######.######.#.#",
+            "#.......#........#.#",
+            "#.#####.##########.#",
+            "#..................#",
+            "####################",
+        ]
+
+        self.maze = Maze(self.layout)
+
+        start_x, start_y = self.maze.player_start
+        self.player = Player(
+            start_x,
+            start_y,
             PLAYER_SIZE,
-            PLAYER_SIZE
+            PLAYER_COLOR,
+            PLAYER_SPEED
         )
 
     def handle_events(self):
-        """Handle window close and keyboard input."""
+        """Handle close button and ESC key."""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
@@ -48,44 +69,40 @@ class GameEngine:
                     self.running = False
 
     def update(self):
-        """Update game logic."""
-        pass
+        """Update game logic and player movement."""
+        keys = pygame.key.get_pressed()
 
-    def draw_grid(self):
-        """Draw a simple background grid."""
-        for x in range(0, WIDTH, TILE_SIZE):
-            pygame.draw.line(
-                self.screen,
-                GRID_COLOR,
-                (x, 0),
-                (x, HEIGHT)
-            )
+        dx = 0
+        dy = 0
 
-        for y in range(0, HEIGHT, TILE_SIZE):
-            pygame.draw.line(
-                self.screen,
-                GRID_COLOR,
-                (0, y),
-                (WIDTH, y)
-            )
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+            dx = -1
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+            dx = 1
+        if keys[pygame.K_UP] or keys[pygame.K_w]:
+            dy = -1
+        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+            dy = 1
+
+        self.player.move(dx, dy, self.maze, WIDTH, HEIGHT)
 
     def draw(self):
-        """Draw everything on the screen."""
+        """Draw maze, text, and player."""
         self.screen.fill(BACKGROUND_COLOR)
 
-        self.draw_grid()
+        self.maze.draw(self.screen)
 
         title_surface = self.title_font.render("Maze Runner", True, TEXT_COLOR)
         info_surface = self.info_font.render(
-            "First game window is working - Press ESC to quit",
+            "Walls are active | Move with Arrow Keys or WASD | ESC to quit",
             True,
             TEXT_COLOR
         )
 
-        self.screen.blit(title_surface, (220, 30))
-        self.screen.blit(info_surface, (150, 100))
+        self.screen.blit(title_surface, (240, 10))
+        self.screen.blit(info_surface, (80, 55))
 
-        pygame.draw.rect(self.screen, PLAYER_COLOR, self.player_rect)
+        self.player.draw(self.screen)
 
         pygame.display.flip()
 
